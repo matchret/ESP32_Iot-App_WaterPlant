@@ -1,0 +1,280 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:slider="clr-namespace:Syncfusion.Maui.Sliders;assembly=Syncfusion.Maui.Sliders"
+             x:Class="WaterPlant_App.MainPage">
+
+    <Grid>
+
+        <ScrollView x:Name="MainContent"
+                IsVisible="False">
+            <VerticalStackLayout Padding="20" Spacing="15">
+
+                <Grid ColumnDefinitions="*,Auto">
+                    <Label Text="🌱 WaterPlant"
+                       FontSize="30"
+                       FontAttributes="Bold"
+                       TextColor="{AppThemeBinding Light=Black, Dark=White}" />
+
+                    <Button x:Name="ThemeButton"
+                        Grid.Column="1"
+                        Text="🌙 Dark"
+                        Clicked="OnThemeClicked" />
+                </Grid>
+
+                <!-- Plant 1 -->
+                <Border Stroke="{AppThemeBinding Light=#DDDDDD, Dark=#333333}"
+                    BackgroundColor="{AppThemeBinding Light=White, Dark=#1E1E1E}"
+                    Padding="15">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="15"/>
+                    </Border.StrokeShape>
+
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Plant 1" FontSize="22" FontAttributes="Bold"
+                           TextColor="{AppThemeBinding Light=Black, Dark=White}"/>
+                        <Label x:Name="Humidity1Label"
+                           TextColor="{AppThemeBinding Light=Black, Dark=#DDDDDD}"/>
+                        <ProgressBar ProgressColor="DodgerBlue"
+                            HeightRequest="12" 
+                            x:Name="Humidity1Bar"/>
+                        <Label x:Name="HumidityRange1Label" 
+                            Text="Min: --% | Target: --%"
+                            TextColor="{AppThemeBinding Light=Black, Dark=#DDDDDD}" />
+                        <slider:SfRangeSlider x:Name="HumidityRange1Slider"
+                            Minimum="0"
+                            Maximum="100"
+                            RangeStart="35"
+                            RangeEnd="60"
+                            HeightRequest="70"
+                            ValueChanged="OnHumidityRange1Changed" />
+                        <Label x:Name="PumpDuration1Label" />
+                        <Slider x:Name="PumpDuration1Slider" 
+                        Minimum="500"
+                        Maximum="10000"
+                        Value="1000"
+                        ValueChanged="OnPumpDuration1Changed" />
+                        <Button Text="Water Now"
+                            Clicked="OnWaterPlant1Clicked"/>
+                        <HorizontalStackLayout Spacing="10">
+                            <Label Text="Enabled"
+           VerticalOptions="Center"
+           TextColor="{AppThemeBinding Light=Black, Dark=#DDDDDD}" />
+                            <Switch x:Name="Plant1EnabledSwitch"
+            IsToggled="True"
+            Toggled="OnPlant1EnabledToggled" />
+                        </HorizontalStackLayout>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Plant 2 -->
+                <Border Stroke="{AppThemeBinding Light=#DDDDDD, Dark=#333333}"
+                    BackgroundColor="{AppThemeBinding Light=White, Dark=#1E1E1E}"
+                    Padding="15">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="15"/>
+                    </Border.StrokeShape>
+
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Plant 2" FontSize="22" FontAttributes="Bold"
+                           TextColor="{AppThemeBinding Light=Black, Dark=White}"/>
+                        <Label x:Name="Humidity2Label"
+                           TextColor="{AppThemeBinding Light=Black, Dark=#DDDDDD}"/>
+                        <ProgressBar ProgressColor="DodgerBlue"
+    HeightRequest="12" x:Name="Humidity2Bar"/>
+                        <Label x:Name="HumidityRange2Label"
+                            TextColor="{AppThemeBinding Light=Black, Dark=#DDDDDD}" />
+                        <slider:SfRangeSlider x:Name="HumidityRange2Slider"
+                            Minimum="0"
+                            Maximum="100"
+                            RangeStart="35"
+                            RangeEnd="60"
+                            HeightRequest="70"
+                            ValueChanged="OnHumidityRange2Changed" />
+                        <Label x:Name="PumpDuration2Label" />
+                        <Slider x:Name="PumpDuration2Slider" 
+                        Minimum="500"
+                        Maximum="10000"
+                        Value="1000"
+                        ValueChanged="OnPumpDuration2Changed" />
+                        <Button Text="Water Now"
+                            Clicked="OnWaterPlant2Clicked"/>
+                        <HorizontalStackLayout Spacing="10">
+                            <Label Text="Enabled"
+           VerticalOptions="Center"
+           TextColor="{AppThemeBinding Light=Black, Dark=#DDDDDD}" />
+                            <Switch x:Name="Plant2EnabledSwitch"
+            IsToggled="True"
+            Toggled="OnPlant2EnabledToggled" />
+                        </HorizontalStackLayout>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Plant 3 -->
+                <Border Stroke="{AppThemeBinding Light=#DDDDDD, Dark=#333333}"
+                    BackgroundColor="{AppThemeBinding Light=White, Dark=#1E1E1E}"
+                    Padding="15">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="15"/>
+                    </Border.StrokeShape>
+
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Plant 3" FontSize="22" FontAttributes="Bold"
+                           TextColor="{AppThemeBinding Light=Black, Dark=White}"/>
+                        <Label x:Name="Humidity3Label"
+                           TextColor="{AppThemeBinding Light=Black, Dark=#DDDDDD}"/>
+                        <ProgressBar ProgressColor="DodgerBlue"
+    HeightRequest="12" x:Name="Humidity3Bar"/>
+                        <Label x:Name="HumidityRange3Label"
+                            TextColor="{AppThemeBinding Light=Black, Dark=#DDDDDD}" />
+                        <slider:SfRangeSlider x:Name="HumidityRange3Slider"
+                            Minimum="0"
+                            Maximum="100"
+                            RangeStart="35"
+                            RangeEnd="60"
+                            HeightRequest="70"
+                            ValueChanged="OnHumidityRange3Changed" />
+                        <Label x:Name="PumpDuration3Label" />
+                        <Slider x:Name="PumpDuration3Slider" 
+                        Minimum="500"
+                        Maximum="10000"
+                        Value="1000"
+                        ValueChanged="OnPumpDuration3Changed" />
+                        <Button Text="Water Now"
+                            Clicked="OnWaterPlant3Clicked"/>
+                        <HorizontalStackLayout Spacing="10">
+                            <Label Text="Enabled"
+           VerticalOptions="Center"
+           TextColor="{AppThemeBinding Light=Black, Dark=#DDDDDD}" />
+                            <Switch x:Name="Plant3EnabledSwitch"
+            IsToggled="True"
+            Toggled="OnPlant3EnabledToggled" />
+                        </HorizontalStackLayout>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Plant 4 -->
+                <Border Stroke="{AppThemeBinding Light=#DDDDDD, Dark=#333333}"
+                    BackgroundColor="{AppThemeBinding Light=White, Dark=#1E1E1E}"
+                    Padding="15">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="15"/>
+                    </Border.StrokeShape>
+
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Plant 4" FontSize="22" FontAttributes="Bold"
+                           TextColor="{AppThemeBinding Light=Black, Dark=White}"/>
+                        <Label x:Name="Humidity4Label"
+                           TextColor="{AppThemeBinding Light=Black, Dark=#DDDDDD}"/>
+                        <ProgressBar ProgressColor="DodgerBlue"
+    HeightRequest="12" x:Name="Humidity4Bar"/>
+                        <Label x:Name="HumidityRange4Label"
+                            TextColor="{AppThemeBinding Light=Black, Dark=#DDDDDD}" />
+                        <slider:SfRangeSlider x:Name="HumidityRange4Slider"
+                            Minimum="0"
+                            Maximum="100"
+                            RangeStart="35"
+                            RangeEnd="60"
+                            HeightRequest="70"
+                            ValueChanged="OnHumidityRange4Changed" />
+                        <Label x:Name="PumpDuration4Label" />
+                        <Slider x:Name="PumpDuration4Slider" 
+                        Minimum="500"
+                        Maximum="10000"
+                        Value="1000"
+                        ValueChanged="OnPumpDuration4Changed" />
+                        <Button Text="Water Now"
+                            Clicked="OnWaterPlant4Clicked"/>
+                        <HorizontalStackLayout Spacing="10">
+                            <Label Text="Enabled"
+           VerticalOptions="Center"
+           TextColor="{AppThemeBinding Light=Black, Dark=#DDDDDD}" />
+                            <Switch x:Name="Plant4EnabledSwitch"
+            IsToggled="True"
+            Toggled="OnPlant4EnabledToggled" />
+                        </HorizontalStackLayout>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Shared settings -->
+                <Border Stroke="{AppThemeBinding Light=#DDDDDD, Dark=#333333}"
+                    BackgroundColor="{AppThemeBinding Light=White, Dark=#1E1E1E}"
+                    Padding="15">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="15"/>
+                    </Border.StrokeShape>
+
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Global Settings"
+                           FontSize="22"
+                           FontAttributes="Bold"
+                           TextColor="{AppThemeBinding Light=Black, Dark=White}"/>
+
+                        <HorizontalStackLayout Spacing="10">
+                            <Label Text="All plants enabled"
+               VerticalOptions="Center"
+               TextColor="{AppThemeBinding Light=Black, Dark=#DDDDDD}" />
+
+                            <Switch x:Name="MasterControlSwitch"
+                Toggled="OnMasterControlToggled" />
+                        </HorizontalStackLayout>
+
+                        <Label Text="Water level"
+           TextColor="{AppThemeBinding Light=Black, Dark=#DDDDDD}" />
+
+                        <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="4" HeightRequest="14">
+                            <BoxView Grid.Column="0" BackgroundColor="DodgerBlue" CornerRadius="4"/>
+                            <BoxView Grid.Column="1" BackgroundColor="DodgerBlue" CornerRadius="4"/>
+                            <BoxView Grid.Column="2" BackgroundColor="DodgerBlue" CornerRadius="4"/>
+                            <BoxView Grid.Column="3" BackgroundColor="#444444" CornerRadius="4"/>
+                        </Grid>
+                    </VerticalStackLayout>
+
+                </Border>
+
+                <Button x:Name="ApplyChangesButton"
+        Text="Apply Changes"
+        IsEnabled="False"
+        BackgroundColor="{AppThemeBinding Light=#28A745, Dark=#1E7E34}"
+        TextColor="White"
+        Clicked="OnApplyChangesClicked" />
+
+
+                <Button x:Name="DiscardChangesButton"
+        Text="Discard Changes"
+        IsEnabled="False"
+        BackgroundColor="#D9534F"
+        TextColor="White"
+        Clicked="OnDiscardChangesClicked"/>
+
+
+                <Label x:Name="LastUpdateLabel"
+                            Text="Last update: Never"
+                            FontSize="14"
+                            Opacity="0.7"/>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <Grid x:Name="LoadingOverlay"
+          BackgroundColor="{AppThemeBinding Light=#F5F5F5, Dark=#121212}"
+          IsVisible="True">
+
+            <VerticalStackLayout VerticalOptions="Center"
+                             HorizontalOptions="Center"
+                             Spacing="15">
+
+                <ActivityIndicator IsRunning="True"
+                               WidthRequest="60"
+                               HeightRequest="60" />
+
+                <Label Text="Syncing with AWS..."
+                   FontSize="18"
+                   TextColor="{AppThemeBinding Light=Black, Dark=White}" />
+
+            </VerticalStackLayout>
+        </Grid>
+
+    </Grid>
+
+</ContentPage>
