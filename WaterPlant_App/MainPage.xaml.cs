@@ -10,6 +10,7 @@ namespace WaterPlant_App
         private int[] minHumidity = { 30, 30, 30, 30 };
         private int[] targetHumidity = { 80, 80, 80, 80 };
         private bool[] plantEnabled = { false,false,false,false};
+        private int waterLevel = 0;
 
         private readonly AwsIotShadowService awsShadowService = new();
         private bool isLoadingFromAws = false;
@@ -77,6 +78,7 @@ namespace WaterPlant_App
                 targetHumidity = state.TargetHumidity;
                 plantEnabled = state.PlantEnabled;
                 pumpDuration = state.PumpDuration;
+                waterLevel = state.WaterLevel;
                 lastDeviceUpdate = state.LastDeviceUpdate;
 
                 UpdateUI();
@@ -151,6 +153,15 @@ namespace WaterPlant_App
     ? $"Last IoT update: {lastDeviceUpdate:yyyy-MM-dd HH:mm:ss}"
     : "Last IoT update: Unknown";
 
+            WaterLevelLabel.Text = waterLevel < 0
+    ? "Water level: Sensor error"
+    : $"Water level: {waterLevel}%";
+
+            WaterLevelPart1.BackgroundColor = waterLevel >= 25 ? Colors.DodgerBlue : Colors.Gray;
+            WaterLevelPart2.BackgroundColor = waterLevel >= 50 ? Colors.DodgerBlue : Colors.Gray;
+            WaterLevelPart3.BackgroundColor = waterLevel >= 75 ? Colors.DodgerBlue : Colors.Gray;
+            WaterLevelPart4.BackgroundColor = waterLevel >= 100 ? Colors.DodgerBlue : Colors.Gray;
+
             isUpdatingUi = false;
         }
 
@@ -170,6 +181,14 @@ namespace WaterPlant_App
                 : Colors.Gray;
         }
 
+        private bool SettingsMatch(AwsIotShadowService.PlantShadowState state)
+        {
+            return
+                state.MinHumidity.SequenceEqual(minHumidity) &&
+                state.TargetHumidity.SequenceEqual(targetHumidity) &&
+                state.PumpDuration.SequenceEqual(pumpDuration) &&
+                state.PlantEnabled.SequenceEqual(plantEnabled);
+        }
         private async void OnApplyChangesClicked(object sender, EventArgs e)
         {
             if (!hasPendingChanges)
@@ -187,24 +206,53 @@ namespace WaterPlant_App
                     plantEnabled
                 );
 
-                hasPendingChanges = false;
-                ApplyChangesButton.Text = "✓ Applied";
+                ApplyChangesButton.Text = "Waiting for ESP32...";
 
-                UpdateButtonStates();
+                bool confirmed = false;
 
-                await DisplayAlertAsync(
-                    "Success",
-                    "Settings sent to AWS.",
-                    "OK");
-
-                _ = Task.Run(async () =>
+                for (int i = 0; i < 10; i++) // wait up to 5 seconds
                 {
-                    await Task.Delay(1500);
-                    await MainThread.InvokeOnMainThreadAsync(async () =>
+                    await Task.Delay(500);
+
+                    var state = await awsShadowService.GetPlantShadowStateAsync();
+
+                    if (SettingsMatch(state))
                     {
-                        await LoadShadowAsync();
-                    });
-                });
+                        humidity = state.Humidity;
+                        minHumidity = state.MinHumidity;
+                        targetHumidity = state.TargetHumidity;
+                        pumpDuration = state.PumpDuration;
+                        plantEnabled = state.PlantEnabled;
+                        waterLevel = state.WaterLevel;
+                        lastDeviceUpdate = state.LastDeviceUpdate;
+
+                        UpdateUI();
+
+                        confirmed = true;
+                        break;
+                    }
+                }
+
+                if (confirmed)
+                {
+                    hasPendingChanges = false;
+
+                    ApplyChangesButton.Text = "✓ Applied";
+
+                    UpdateButtonStates();
+                }
+                else
+                {
+                    hasPendingChanges = true;
+                    ApplyChangesButton.IsEnabled = true;
+                    ApplyChangesButton.Text = "ESP32 not responding";
+                    DiscardChangesButton.IsEnabled = true;
+
+                    await DisplayAlertAsync(
+                        "Timeout",
+                        "The ESP32 did not confirm the new settings.",
+                        "OK");
+                }
             }
             catch (Exception ex)
             {

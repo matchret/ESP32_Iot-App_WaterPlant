@@ -20,11 +20,19 @@ void messageHandler(char* topic, byte* payload, unsigned int length);
 #define CONTROL4_PIN 22
 
 
-// ===== SENSOR =====
+// ===== SENSOR HUMIDITY =====
 #define SENSOR1_PIN 34
 #define SENSOR2_PIN 35
 #define SENSOR3_PIN 32
 #define SENSOR4_PIN 33
+
+// ===== WATER LEVEL =====
+#define WATER_POWER_PIN 25
+
+#define WATER_LEVEL_25_PIN 26
+#define WATER_LEVEL_50_PIN 27
+#define WATER_LEVEL_75_PIN 14
+#define WATER_LEVEL_100_PIN 13
 
 const int AirValue = 3450;
 int WaterValue = 1700;
@@ -136,7 +144,7 @@ void messageHandler(char* topic, byte* payload, unsigned int length) {
 
     Serial.printf("Manual watering plant %d\n", plant + 1);
 
-    if (plant >= 0 && plant < 4 && plantEnabled[plant])
+    if (plant >= 0 && plant < 4 && plantEnabled[plant] && getWaterLevel() > 0)
     {
         waterPlant(plant);
 
@@ -184,6 +192,12 @@ void messageHandler(char* topic, byte* payload, unsigned int length) {
 }
 
   Serial.println("Shadow settings updated");
+
+  int humidity[4];
+  for (int i = 0; i < 4; i++)
+    humidity[i] = readHumidity(sensorPins[i]);
+
+publishShadowState(humidity, getWaterLevel());
 }
 
 // ===== SETUP =====
@@ -192,6 +206,14 @@ void setupPins() {
     pinMode(controlPins[i], OUTPUT);
     digitalWrite(controlPins[i], HIGH); // pompe OFF
   }
+
+  pinMode(WATER_POWER_PIN, OUTPUT);
+  digitalWrite(WATER_POWER_PIN, LOW);
+
+  pinMode(WATER_LEVEL_25_PIN, INPUT_PULLDOWN);
+  pinMode(WATER_LEVEL_50_PIN, INPUT_PULLDOWN);
+  pinMode(WATER_LEVEL_75_PIN, INPUT_PULLDOWN);
+  pinMode(WATER_LEVEL_100_PIN, INPUT_PULLDOWN);
 }
 
 void setup() {
@@ -211,12 +233,96 @@ int readHumidity(int pin) {
   return constrain(humidity, 0, 100);
 }
 
+
+int getWaterLevel()
+{
+  digitalWrite(WATER_POWER_PIN, HIGH);
+  delay(10);
+
+  bool s25  = digitalRead(WATER_LEVEL_25_PIN);
+  bool s50  = digitalRead(WATER_LEVEL_50_PIN);
+  bool s75  = digitalRead(WATER_LEVEL_75_PIN);
+  bool s100 = digitalRead(WATER_LEVEL_100_PIN);
+
+  digitalWrite(WATER_POWER_PIN, LOW);
+
+  if (s25 && s50 && s75 && s100) return 100;
+  if (s25 && s50 && s75 && !s100) return 75;
+  if (!s25 && s50 && s75 && !s100) return 50;
+  if (!s25 && !s50 && s75 && !s100) return 25;
+  if (!s25 && !s50 && !s75 && !s100) return 0;
+
+  return -1; // sensor error / impossible pattern
+}
+
+void publishShadowState(int humidity[], int waterLevel)
+{
+
+    String payload = "{";
+    payload += "\"state\":{\"reported\":{";
+
+    payload += "\"humidity\":[";
+    for (int i = 0; i < 4; i++) {
+        payload += String(humidity[i]);
+        if (i < 3) payload += ",";
+    }
+    payload += "],";
+
+    payload += "\"minHumidity\":[";
+    for (int i = 0; i < 4; i++) {
+        payload += String(minHumidity[i]);
+        if (i < 3) payload += ",";
+    }
+    payload += "],";
+
+    payload += "\"targetHumidity\":[";
+    for (int i = 0; i < 4; i++) {
+        payload += String(targetHumidity[i]);
+        if (i < 3) payload += ",";
+    }
+    payload += "],";
+
+    payload += "\"pumpDuration\":[";
+    for (int i = 0; i < 4; i++) {
+        payload += String(pumpDuration[i]);
+        if (i < 3) payload += ",";
+    }
+    payload += "],";
+
+    payload += "\"plantEnabled\":[";
+    for (int i = 0; i < 4; i++) {
+        payload += plantEnabled[i] ? "true" : "false";
+        if (i < 3) payload += ",";
+    }
+    payload += "],";
+
+    payload += "\"waterLevel\":";
+    payload += String(waterLevel);
+
+    payload += "}}}";
+
+    client.publish(shadowUpdateTopic, payload.c_str());
+    client.publish(mqtt_topic, payload.c_str());
+
+    Serial.println("Shadow updated.");
+}
+
+
 void loop() {
   if (!client.connected()) {
     connectAWS();
     delay(1000);
     return;
   }
+
+  int waterLevel = getWaterLevel();
+
+bool waterSafe = waterLevel > 0;
+
+if (!waterSafe)
+{
+  Serial.println("Tank empty or water level sensor error - watering disabled");
+}
 
   client.loop(); // must run often for AWS messages
 
@@ -233,7 +339,7 @@ void loop() {
   for (int i = 0; i < 4; i++) {
     humidity[i] = readHumidity(sensorPins[i]);
 
-    if (plantEnabled[i] && humidity[i] < minHumidity[i])  {
+    if (waterSafe && plantEnabled[i] && humidity[i] < minHumidity[i])  {
       int tries = 0;
 
       while (humidity[i] < targetHumidity[i] && tries < 3) {
@@ -251,48 +357,5 @@ void loop() {
     }
   }
 
-  String payload = "{";
-  payload += "\"state\":{";
-  payload += "\"reported\":{";
-
-  payload += "\"humidity\":[";
-  for (int i = 0; i < 4; i++) {
-    payload += String(humidity[i]);
-    if (i < 3) payload += ",";
-  }
-  payload += "],";
-
-  payload += "\"minHumidity\":[";
-  for (int i = 0; i < 4; i++) {
-    payload += String(minHumidity[i]);
-    if (i < 3) payload += ",";
-  }
-  payload += "],";
-
-    payload += "\"targetHumidity\":[";
-  for (int i = 0; i < 4; i++) {
-    payload += String(targetHumidity[i]);
-    if (i < 3) payload += ",";
-  }
-  payload += "],";
-
-  payload += "\"pumpDuration\":[";
-  for (int i = 0; i < 4; i++) {
-    payload += String(pumpDuration[i]);
-    if (i < 3) payload += ",";
-  }
-  payload += "],";
-
-  payload += "\"plantEnabled\":[";
-for (int i = 0; i < 4; i++) {
-  payload += plantEnabled[i] ? "true" : "false";
-  if (i < 3) payload += ",";
-}
-payload += "]";
-
-  payload += "}}}";
-
-  Serial.println(payload);
-  client.publish(shadowUpdateTopic, payload.c_str());
-  client.publish(mqtt_topic, payload.c_str());
+  publishShadowState(humidity, waterLevel);
 }

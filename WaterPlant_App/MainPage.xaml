@@ -219,14 +219,15 @@
                 Toggled="OnMasterControlToggled" />
                         </HorizontalStackLayout>
 
-                        <Label Text="Water level"
-           TextColor="{AppThemeBinding Light=Black, Dark=#DDDDDD}" />
+                        <Label x:Name="WaterLevelLabel"
+                        Text="Water level: --%"
+                        TextColor="{AppThemeBinding Light=Black, Dark=#DDDDDD}" />
 
                         <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="4" HeightRequest="14">
-                            <BoxView Grid.Column="0" BackgroundColor="DodgerBlue" CornerRadius="4"/>
-                            <BoxView Grid.Column="1" BackgroundColor="DodgerBlue" CornerRadius="4"/>
-                            <BoxView Grid.Column="2" BackgroundColor="DodgerBlue" CornerRadius="4"/>
-                            <BoxView Grid.Column="3" BackgroundColor="#444444" CornerRadius="4"/>
+                            <BoxView x:Name="WaterLevelPart1" Grid.Column="0" BackgroundColor="Gray" CornerRadius="4"/>
+                            <BoxView x:Name="WaterLevelPart2" Grid.Column="1" BackgroundColor="Gray" CornerRadius="4"/>
+                            <BoxView x:Name="WaterLevelPart3" Grid.Column="2" BackgroundColor="Gray" CornerRadius="4"/>
+                            <BoxView x:Name="WaterLevelPart4" Grid.Column="3" BackgroundColor="Gray" CornerRadius="4"/>
                         </Grid>
                     </VerticalStackLayout>
 

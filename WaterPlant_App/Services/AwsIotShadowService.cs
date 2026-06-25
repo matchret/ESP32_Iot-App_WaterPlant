@@ -30,6 +30,7 @@ namespace WaterPlant_App.Services
             _client = new AmazonIotDataClient(credentials, config);
         }
 
+
         public async Task UpdateSettingsAsync(
             int[] minHumidity,
             int[] targetHumidity,
@@ -126,6 +127,8 @@ namespace WaterPlant_App.Services
 
             public bool[] PlantEnabled { get; set; } = { false, false, false, false};
             public int[] PumpDuration { get; set; } = [1000, 1000, 1000, 1000];
+
+            public int WaterLevel { get; set; } = 0;
         }
 
         public async Task<PlantShadowState> GetPlantShadowStateAsync()
@@ -149,11 +152,6 @@ namespace WaterPlant_App.Services
             var reported = rootState.GetProperty("reported");
 
             JsonElement settingsSource = reported;
-
-            if (rootState.TryGetProperty("desired", out var desiredJson))
-            {
-                settingsSource = desiredJson;
-            }
 
             if (doc.RootElement.TryGetProperty("metadata", out var metadata) &&
     metadata.TryGetProperty("reported", out var reportedMetadata))
@@ -230,6 +228,11 @@ namespace WaterPlant_App.Services
                     .EnumerateArray()
                     .Select(x => x.GetBoolean())
                     .ToArray();
+            }
+
+            if (reported.TryGetProperty("waterLevel", out var waterLevelJson))
+            {
+                state.WaterLevel = waterLevelJson.GetInt32();
             }
 
             return state;
